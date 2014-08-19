@@ -10,22 +10,24 @@ import openfl.geom.Rectangle;
 
 class Character extends Sprite {
 
-	var sprite : Sprite;
+	var framesPerAction = 4;
 	var frames : Array<Bitmap>;
+	var currentFrameIndex : Int;
+
+	var characterAction : CharacterAction;
 
 	function new(filename : String){
 
 		super();
 
-		loadGraphics(filename, 4, 4);
+		currentFrameIndex = 0;
+		loadGraphics(filename, framesPerAction, 4);
 
 	}
 
 	//Load ducky spritesheet and cut him up into frames
 	function loadGraphics(filename : String, columns : Int, rows : Int){
 
-		sprite = new Sprite();
-		
 		var bitmapData = Assets.getBitmapData(filename);
 		frames = new Array<Bitmap>();
 		
@@ -40,13 +42,56 @@ class Character extends Sprite {
 				);
 				var bitmap = new Bitmap(bmpd);
 				frames.push(bitmap);
-				sprite.addChild(bitmap);
+				addChild(bitmap);
 				bitmap.visible = false;
 			}
 		}
 
-		frames[0].visible = true;
+		showFrame(0);
 
 	}
 
+	//make the current frame invisible and show a new frame
+	function showFrame(frameIndex : Int){
+
+		if (frameIndex > frames.length-1){
+			trace("Attempted to show an out of bounds frame");
+			frameIndex = frameIndex % frames.length;
+		}
+
+		frames[currentFrameIndex].visible = false;
+		frames[frameIndex].visible = true;
+		currentFrameIndex = frameIndex;
+
+	}
+
+	public function setAction(newAction : CharacterAction){
+
+		chararcterAction = newAction;
+
+	}
+
+	//get the base frame for a given action
+	function getActionBaseFrameIndex(action:CharacterAction){
+
+		switch(action){
+			case idleRight:
+				return 0;
+			case idleLeft:
+				return framesPerAction;
+			case walkRight:
+				return framesPerAction*2;
+			case walkLeft:
+				return framesPerAction*3;
+		}
+
+	}
+
+}
+
+enum CharacterAction {
+	idleRight;
+	idleLeft;
+	walkRight;
+	walkLeft;
 }

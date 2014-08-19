@@ -11,6 +11,8 @@ import openfl.Assets;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
 
+import com.pixelsyntax.ducky.Character;
+
 class Ducky extends Sprite {
 
 	//graphics
@@ -21,7 +23,7 @@ class Ducky extends Sprite {
 	//ducky
 	var duckyBitmapData : BitmapData;
 	var duckyFrames : Array<Bitmap>;
-	var ducky : Sprite;
+	var ducky : Character;
 	//background
 	var background : Sprite;
 	//layers
@@ -75,6 +77,9 @@ class Ducky extends Sprite {
 		addChild(reflectionMask);
 
 		keyboardSetup();
+
+		ducky = new Character("assets/ducks.png");
+		spriteLayer.addChild(ducky);
 
 	}
 
