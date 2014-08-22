@@ -12,7 +12,9 @@ class Character extends Sprite {
 
 	var framesPerAction = 4;
 	var frames : Array<Bitmap>;
-	var currentFrameIndex : Int;
+	var currentFrameIndex : Int; //current frame 0>x>framesPerAction
+	var prevFrameIndex : Int;
+	var facingRight : Bool; //remember if we were facing right last walk
 
 	var characterAction : CharacterAction;
 
@@ -20,8 +22,98 @@ class Character extends Sprite {
 
 		super();
 
+		characterAction = walkLeft;
+
 		currentFrameIndex = 0;
+		prevFrameIndex = 0;
 		loadGraphics(filename, framesPerAction, 4);
+
+		facingRight = true;
+
+	}
+
+	public function setIdle(){
+
+		if (facingRight)
+			setAction(idleRight);
+		else
+			setAction(idleLeft);
+
+	}
+
+	public function setAction(newAction : CharacterAction){
+
+		characterAction = newAction;
+		switch(newAction){
+			case walkRight, idleRight: 
+				facingRight = true;
+			default:
+				facingRight = false;
+		}
+
+	}
+
+	//increment the frame index
+	public function frameTick(){
+
+		currentFrameIndex = (currentFrameIndex + 1) % framesPerAction;
+		updateSprite();
+
+	}
+
+	//update the displayed bitmap for this sprite
+	function updateSprite(){
+
+		showFrame(getActionBaseFrameIndex(characterAction) + currentFrameIndex);
+
+	}
+
+	public function moveDelta(delta:Point){
+
+		x += delta.x;
+		y += delta.y;
+
+
+		if (delta.x > 0)
+			facingRight = true;
+		if (delta.x < 0)
+			facingRight = false;
+
+		if (delta.x != 0 || delta.y != 0){
+			setAction((facingRight) ? walkRight : walkLeft);
+		} else {
+			setIdle();
+		}
+
+	}
+
+	//make the current frame invisible and show a new frame
+	function showFrame(frameIndex : Int){
+
+		if (frameIndex > frames.length-1){
+			trace("Attempted to show an out of bounds frame");
+			frameIndex = frameIndex % frames.length;
+		}
+
+		frames[prevFrameIndex].visible = false;
+		frames[frameIndex].visible = true;
+		prevFrameIndex = frameIndex;
+
+	}
+
+	//get the base frame for a given action
+	function getActionBaseFrameIndex(action:CharacterAction){
+
+		switch(action){
+			case idleRight:
+				return 0;
+			case idleLeft:
+				return framesPerAction;
+			case walkRight:
+				return framesPerAction*2;
+			case walkLeft:
+				return framesPerAction*3;
+		}
 
 	}
 
@@ -46,45 +138,6 @@ class Character extends Sprite {
 				bitmap.visible = false;
 			}
 		}
-
-		showFrame(0);
-
-	}
-
-	//make the current frame invisible and show a new frame
-	function showFrame(frameIndex : Int){
-
-		if (frameIndex > frames.length-1){
-			trace("Attempted to show an out of bounds frame");
-			frameIndex = frameIndex % frames.length;
-		}
-
-		frames[currentFrameIndex].visible = false;
-		frames[frameIndex].visible = true;
-		currentFrameIndex = frameIndex;
-
-	}
-
-	public function setAction(newAction : CharacterAction){
-
-		chararcterAction = newAction;
-
-	}
-
-	//get the base frame for a given action
-	function getActionBaseFrameIndex(action:CharacterAction){
-
-		switch(action){
-			case idleRight:
-				return 0;
-			case idleLeft:
-				return framesPerAction;
-			case walkRight:
-				return framesPerAction*2;
-			case walkLeft:
-				return framesPerAction*3;
-		}
-
 	}
 
 }

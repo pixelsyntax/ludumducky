@@ -6,6 +6,8 @@
 	
 	<source path="Source" />
 	
+	<window fps="16" />
+
 	<haxelib name="openfl" />
 	
 	<assets path="Assets" rename="assets" exclude="openfl.svg" />

@@ -12,6 +12,8 @@ import openfl.geom.Point;
 import openfl.geom.Rectangle;
 
 import com.pixelsyntax.ducky.Character;
+import com.pixelsyntax.ducky.GameMap;
+
 
 class Ducky extends Sprite {
 
@@ -26,6 +28,7 @@ class Ducky extends Sprite {
 	var ducky : Character;
 	//background
 	var background : Sprite;
+	var gameMap : GameMap;
 	//layers
 	var spriteLayer : Sprite; 		//holds normal sprites
 	var reflections : Sprite; 		//inverted transparent sprites
@@ -55,11 +58,17 @@ class Ducky extends Sprite {
 		super();
 
 		addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+		addEventListener(Event.ENTER_FRAME, onEnterFrame);
 		
 		background = new Sprite();
 		background.graphics.beginFill(0x663333);
 		background.graphics.drawRect(0,0,screenWidth, screenHeight);
 		addChild(background);
+
+		gameMap = new GameMap();
+		gameMap.scaleX = scale;
+		gameMap.scaleY = scale;
+		addChild(gameMap);
 
 		spriteLayer = new Sprite();
 		spriteLayer.scaleX = scale;
@@ -83,8 +92,6 @@ class Ducky extends Sprite {
 
 	}
 
-
-
 	//placeholder hardcoded keyboard bindings
 	function keyboardSetup () {
 
@@ -94,6 +101,33 @@ class Ducky extends Sprite {
 		bindKeyRight = Keyboard.D;
 
 	}
+
+	function onEnterFrame (e:Event) {
+		
+		duckyInput();
+		ducky.frameTick();
+
+	}
+
+	function duckyInput(){
+		
+		var delta = new Point(0,0);
+		if (keyMoveRight){
+			delta.x = 2;
+		}
+		if (keyMoveLeft){
+			delta.x = -2;
+		}
+		if (keyMoveUp){
+			delta.y = -2;
+		}
+		if (keyMoveDown){
+			delta.y = 2;
+		}
+		
+		ducky.moveDelta(delta);
+	}
+
 
 	//setup that can only take place once this object is on the stage and
 	//the stage variable has been assigned
@@ -113,6 +147,8 @@ class Ducky extends Sprite {
 		}
 
 	}
+
+
 
 	function onKeyDown(e:KeyboardEvent){
 
